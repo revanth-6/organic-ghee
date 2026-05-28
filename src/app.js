@@ -1,4 +1,5 @@
 const express =require('express')
+const path = require('path')
 const hbs=require('hbs')
 const route=require('./routers/main')
 const bodyParser=require('body-parser');
@@ -18,12 +19,12 @@ app.use(bodyParser.urlencoded({
 
 app.use('',route)
 //static folder
-app.use("/static",express.static("public"));
+app.use("/static",express.static(path.join(__dirname, '..', 'public')));
 //template engine
 app.set("view engine",'hbs')
-app.set("views",'views')
+app.set("views",path.join(__dirname, '..', 'views'))
 //app.set("views","")
-hbs.registerPartials('views/partials')
+hbs.registerPartials(path.join(__dirname, '..', 'views', 'partials'))
 
 
 
@@ -32,6 +33,9 @@ hbs.registerPartials('views/partials')
 mongoose.connect(process.env.AZURE_COSMOS_CONNECTIONSTRING)
 .then(() => {
     console.log("MongoDB Connected");
+})
+.catch((err) => {
+    console.error("MongoDB connection error:", err.message);
 })
 const PORT = process.env.PORT || 5656;
 

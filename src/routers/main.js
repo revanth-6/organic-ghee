@@ -6,8 +6,13 @@ const User = require('../modul/user')
 const dish = require("../modul/dish");
 const order = require('../modul/order')
 const { __express } = require('hbs');
-const { restart } = require('nodemon');
 const fs = require('fs')
+const path = require('path')
+
+const uploadDir = path.join(__dirname, '..', '..', 'public', 'dishImage');
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+}
 
 route.get("/", (req, res) => {
     const loginUser = req.session.loginUser;
@@ -166,7 +171,7 @@ route.post('/saveDish', async (req, res) => {
     req.body.photo = imageName;
     const data = await dish.create(req.body)
 
-    photo.mv("D:/document/projects/Restorent/public/dishImage/" + imageName);
+    photo.mv(path.join(uploadDir, imageName));
     if (data) {
         console.log("dish save")
         res.render("addNewDish", {
@@ -319,7 +324,7 @@ route.post("/admin/saveEditDish/:id", async (req, res) => {
         else {
             console.log("photo to is selected ols photo is " + req.body.tempImage)
             try {
-                fs.unlinkSync('D:/document/projects/Restorent/public/dishImage/' + req.body.tempImage)
+                fs.unlinkSync(path.join(uploadDir, req.body.tempImage))
                 console.log('old file is deleted')
             } catch (e) {
                 console.log(e)
@@ -327,7 +332,7 @@ route.post("/admin/saveEditDish/:id", async (req, res) => {
             const { photo } = req.files
             const imageName=Math.random()+photo.name;
             req.body.photo =imageName;
-            photo.mv("D:/document/projects/Restorent/public/dishImage/" + imageName);
+            photo.mv(path.join(uploadDir, imageName));
             console.log(req.body.photo)
         }
 
